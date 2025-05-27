@@ -13,6 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.lbwatch.R
 import com.example.lbwatch.adapter.SearchAdapter
 import com.example.lbwatch.viewModel.SearchViewModel
+import com.example.lbwatch.viewModel.SearchViewModelFactory
+import com.example.lbwatch.domain.SearchUseCase
+import com.example.lbwatch.dataLayer.repository.MovieRepositoryImpl
+import com.example.lbwatch.dataLayer.api.ClientAPI
+import com.example.lbwatch.dataLayer.model.MovieDB
 
 class SearchActivity : AppCompatActivity() {
 
@@ -22,7 +27,20 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private var query = ""
 
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by viewModels {
+        // Получаем DAO из MovieDB
+        val movieDb = MovieDB.getDb(application)
+        val dao = movieDb.getDao()
+
+        // Передаем ClientAPI и DAO в MovieRepositoryImpl
+        val repository = MovieRepositoryImpl(ClientAPI.create(), dao)
+
+        // Создаем SearchUseCase с использованием репозитория
+        val searchUseCase = SearchUseCase(repository)
+
+        // Инициализируем фабрику, передаем application и searchUseCase
+        SearchViewModelFactory(application, searchUseCase)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,10 +72,10 @@ class SearchActivity : AppCompatActivity() {
         })
 
         searchViewModel.items.observe(this, Observer { items ->
-            if (items?.isNotEmpty() == true) { // Проверка на null и пустоту
+            if (items?.isNotEmpty() == true) {
                 noMoviesTextView.visibility = View.INVISIBLE
                 recyclerView.visibility = View.VISIBLE
-                adapter.updateData(items) // Обновляем данные в адаптере
+                adapter.updateData(items)
             } else {
                 recyclerView.visibility = View.INVISIBLE
                 noMoviesTextView.visibility = View.VISIBLE
