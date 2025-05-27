@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lbwatch.R
-import com.example.lbwatch.model.Item
+import com.example.lbwatch.dataLayer.model.Item
 import com.squareup.picasso.Picasso
 
 class SearchAdapter(

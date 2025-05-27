@@ -1,4 +1,4 @@
-package com.example.lbwatch.model
+package com.example.lbwatch.dataLayer.model
 
 import android.content.Context
 import androidx.room.Database

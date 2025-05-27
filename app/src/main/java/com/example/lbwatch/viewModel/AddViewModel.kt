@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.lbwatch.model.Movie
-import com.example.lbwatch.model.MovieDB
+import com.example.lbwatch.dataLayer.model.Movie
+import com.example.lbwatch.dataLayer.model.MovieDB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

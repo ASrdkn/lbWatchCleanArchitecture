@@ -5,8 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.lbwatch.api.ClientAPI
-import com.example.lbwatch.model.Item
+import com.example.lbwatch.dataLayer.api.ClientAPI
+import com.example.lbwatch.dataLayer.model.Item
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit

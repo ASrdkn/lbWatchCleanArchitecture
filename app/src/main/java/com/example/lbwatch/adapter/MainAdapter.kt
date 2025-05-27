@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lbwatch.R
-import com.example.lbwatch.model.Movie
+import com.example.lbwatch.dataLayer.model.Movie
 import com.squareup.picasso.Picasso
 
 class MainAdapter(
