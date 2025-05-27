@@ -13,11 +13,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.lbwatch.R
 import com.example.lbwatch.viewModel.AddViewModel
+import com.example.lbwatch.viewModel.AddViewModelFactory
 import com.squareup.picasso.Picasso
 
 class AddActivity : AppCompatActivity() {
 
-    private val addViewModel: AddViewModel by viewModels()
+    private val addViewModel: AddViewModel by viewModels {
+        AddViewModelFactory(application)
+    }
 
     private lateinit var titleEditText: EditText
     private lateinit var releaseDateEditText: EditText
@@ -49,11 +52,6 @@ class AddActivity : AppCompatActivity() {
             }
         })
 
-        // Наблюдение за изменениями в списке фильмов
-        addViewModel.allMovies.observe(this, Observer { movies ->
-            Toast.makeText(this, "Список фильмов обновлен", Toast.LENGTH_SHORT).show()
-        })
-
         // Обработчик кнопки поиска
         searchBtn.setOnClickListener {
             if (titleEditText.text.isEmpty()) {
@@ -74,7 +72,7 @@ class AddActivity : AppCompatActivity() {
         addBtn.setOnClickListener {
             val title = titleEditText.text.toString().trim()
             val releaseDate = releaseDateEditText.text.toString().trim()
-            val posterPath = movieImageView.tag?.toString().orEmpty()  // Используем безопасный вызов и .orEmpty()
+            val posterPath = movieImageView.tag?.toString().orEmpty()
 
             if (title.isEmpty() || releaseDate.isEmpty()) {
                 Toast.makeText(
@@ -84,11 +82,7 @@ class AddActivity : AppCompatActivity() {
                 ).show()
             } else {
                 // Обновляем данные в ViewModel
-                addViewModel.title.value = title
-                addViewModel.releaseDate.value = releaseDate
-                addViewModel.moviePosterPath.value = posterPath
-
-                addViewModel.addMovie()
+                addViewModel.addMovie(title, releaseDate, posterPath)
                 Toast.makeText(this, "Фильм успешно добавлен", Toast.LENGTH_SHORT).show()
                 setResult(Activity.RESULT_OK)
                 finish()
