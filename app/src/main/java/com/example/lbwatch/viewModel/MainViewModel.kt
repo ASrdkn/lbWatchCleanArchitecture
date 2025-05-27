@@ -3,39 +3,50 @@ package com.example.lbwatch.viewModel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.lbwatch.dataLayer.model.Movie
-import com.example.lbwatch.dataLayer.model.MovieDB
-import kotlinx.coroutines.Dispatchers
+import com.example.lbwatch.domain.AddMoviesUseCase
+import com.example.lbwatch.domain.DeleteMoviesUseCase
+import com.example.lbwatch.domain.GetMoviesUseCase
 import kotlinx.coroutines.launch
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel(
+    application: Application,
+    private val getMoviesUseCase: GetMoviesUseCase,
+    private val deleteMoviesUseCase: DeleteMoviesUseCase,
+    private val addMoviesUseCase: AddMoviesUseCase
+) : AndroidViewModel(application) {
 
-    private val movieDao = MovieDB.getDb(application).getDao()
-
-    // LiveData для списка фильмов
-    val movies: LiveData<List<Movie>> = movieDao.getAll().asLiveData()
+    private val _movies = MutableLiveData<List<Movie>>()
+    val movies: LiveData<List<Movie>> = _movies
 
     private val selectedMovies = mutableSetOf<Movie>()
 
-    // Функция для удаления выбранных фильмов
-    fun deleteMovies(moviesToDelete: List<Movie>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            for (movie in moviesToDelete) {
-                movieDao.delete(movie)
-            }
+    // Загрузка фильмов
+    fun loadMovies() {
+        viewModelScope.launch {
+            _movies.value = getMoviesUseCase.execute()
         }
     }
-
-    // Функция для добавления нового фильма
+    // Добавление нового фильма
     fun addMovie(movie: Movie) {
-        viewModelScope.launch(Dispatchers.IO) {
-            movieDao.insert(movie)
+        viewModelScope.launch {
+            addMoviesUseCase.execute(movie)
+            loadMovies()
         }
     }
-
-    // Добавление или удаление фильма из выбранных
+    // Удаление выбранных фильмов
+    fun deleteMovies() {
+        if (selectedMovies.isEmpty()) {
+            return
+        }
+        viewModelScope.launch {
+            deleteMoviesUseCase.execute(selectedMovies.toList())
+            loadMovies()
+        }
+    }
+    // Управление выбором фильма
     fun toggleMovieSelection(movie: Movie, isSelected: Boolean) {
         if (isSelected) {
             selectedMovies.add(movie)
@@ -43,9 +54,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             selectedMovies.remove(movie)
         }
     }
-
-    // Получение списка выбранных фильмов
     fun getSelectedMovies(): List<Movie> {
         return selectedMovies.toList()
+    }
+    fun areMoviesSelected(): Boolean {
+        return selectedMovies.isNotEmpty()
     }
 }
