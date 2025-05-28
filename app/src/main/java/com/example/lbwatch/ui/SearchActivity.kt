@@ -28,17 +28,10 @@ class SearchActivity : AppCompatActivity() {
     private var query = ""
 
     private val searchViewModel: SearchViewModel by viewModels {
-        // Получаем DAO из MovieDB
         val movieDb = MovieDB.getDb(application)
         val dao = movieDb.getDao()
-
-        // Передаем ClientAPI и DAO в MovieRepositoryImpl
         val repository = MovieRepositoryImpl(ClientAPI.create(), dao)
-
-        // Создаем SearchUseCase с использованием репозитория
         val searchUseCase = SearchUseCase(repository)
-
-        // Инициализируем фабрику, передаем application и searchUseCase
         SearchViewModelFactory(application, searchUseCase)
     }
 
@@ -51,15 +44,11 @@ class SearchActivity : AppCompatActivity() {
         noMoviesTextView = findViewById(R.id.no_movies_textview)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Получаем запрос для поиска
-        val i = intent
-        query = i.getStringExtra(SEARCH_QUERY) ?: ""
+        query = intent.getStringExtra(SEARCH_QUERY) ?: ""
 
-        // Инициализация адаптера
         adapter = SearchAdapter(this, itemListener)
         recyclerView.adapter = adapter
 
-        // Наблюдаем за состоянием загрузки, ошибками и результатами
         searchViewModel.loading.observe(this, Observer { isLoading ->
             progressBar.visibility = if (isLoading) View.VISIBLE else View.INVISIBLE
         })
@@ -82,7 +71,6 @@ class SearchActivity : AppCompatActivity() {
             }
         })
 
-        // Выполняем запрос на получение фильмов
         searchViewModel.fetchMovies(query)
     }
 
@@ -96,6 +84,11 @@ class SearchActivity : AppCompatActivity() {
             setResult(RESULT_OK, replyIntent)
             finish()
         }
+    }
+
+    override fun onBackPressed() {
+        setResult(RESULT_CANCELED)
+        super.onBackPressed()
     }
 
     companion object {

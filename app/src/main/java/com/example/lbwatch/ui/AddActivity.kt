@@ -93,11 +93,17 @@ class AddActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        this@AddActivity.runOnUiThread {
-            addViewModel.title.value = data?.getStringExtra(SearchActivity.EXTRA_TITLE)
-            addViewModel.releaseDate.value = data?.getStringExtra(SearchActivity.EXTRA_RELEASE_DATE)
-            addViewModel.moviePosterPath.value = data?.getStringExtra(SearchActivity.EXTRA_POSTER_PATH)
+        if (requestCode == SEARCH_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            addViewModel.title.value = data.getStringExtra(SearchActivity.EXTRA_TITLE)
+            addViewModel.releaseDate.value = data.getStringExtra(SearchActivity.EXTRA_RELEASE_DATE)
+            addViewModel.moviePosterPath.value = data.getStringExtra(SearchActivity.EXTRA_POSTER_PATH)
         }
+    }
+
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        super.onBackPressed()
     }
 
     companion object {
